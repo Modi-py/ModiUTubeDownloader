@@ -1,72 +1,47 @@
 @echo off
-net file 1>nul 2>nul
-if '%errorlevel%' == '0' ( goto gotAdmin ) else ( goto getPrivileges )
+setlocal
+
+:: --- ADMIN ESCALATION BLOCK ---
+NET FILE 1>NUL 2>NUL
+if '%errorlevel%' == '0' ( goto gotPrivileges ) else ( goto getPrivileges )
 
 :getPrivileges
-if '%1'=='ELEV' ( shift & goto gotAdmin )
-set "batchPath=%~f0"
-setlocal EnableDelayedExpansion
-echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\OEgetPriv.vbs"
-echo UAC.ShellExecute "!batchPath!", "ELEV", "", "runas", 1 >> "%temp%\OEgetPriv.vbs"
-"%temp%\OEgetPriv.vbs"
-del "%temp%\OEgetPriv.vbs"
-exit /B
+if '%1'=='ELEV' ( goto gotPrivileges )
+echo Requesting administrative privileges...
+powershell -Command "Start-Process '%~f0' -ArgumentList 'ELEV' -Verb RunAs"
+exit /b
 
-:gotAdmin
-pushd "%~dp0"
-setlocal & cd /d %~dp0
-:: ------------------------------------
+:gotPrivileges
+cd /d %~dp0
 
-echo Checking for Python...
-python --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Python not found. Downloading and installing...
-    
-    :: Download using absolute path so it saves where the script is
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.12.4/python-3.12.4-amd64.exe' -OutFile '%~dp0python_install.exe'"
-    
-    :: Install using absolute path
-    start /wait "" "%~dp0python_install.exe" /quiet InstallAllUsers=1 PrependPath=1
-    
-    :: Clean up
-    del "%~dp0python_install.exe"
-)
+set "PROJECT_DIR=C:\Tools\ModiUTubeDownloader"
+set "DESKTOP_DIR=%USERPROFILE%\Desktop"
 
-:: --- Existing FFmpeg, yt-dlp, and Deno logic remains here ---
-chcp 65001 >nul
-echo Setting up environment...
+:: --- 1. CREATE DIRECTORIES ---
+if not exist "%PROJECT_DIR%" mkdir "%PROJECT_DIR%"
+if not exist "%DESKTOP_DIR%\Audio_Downloads" mkdir "%DESKTOP_DIR%\Audio_Downloads"
+if not exist "%DESKTOP_DIR%\Video_Downloads" mkdir "%DESKTOP_DIR%\Video_Downloads"
 
-:: 1. Check/Install FFmpeg
-where ffmpeg >nul 2>nul
-if %errorlevel% neq 0 (
-    echo Downloading FFmpeg...
-    powershell -Command "Invoke-WebRequest -Uri 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip' -OutFile '%~dp0ffmpeg.zip'"
-    echo Extracting...
-    if not exist "C:\Tools" mkdir "C:\Tools"
-    powershell -Command "Expand-Archive -Path '%~dp0ffmpeg.zip' -DestinationPath 'C:\Tools\ffmpeg_temp'"
-    :: Move contents out of the nested folder that usually comes in the zip
-    move "C:\Tools\ffmpeg_temp\ffmpeg-*-essentials_build\*" "C:\Tools\ffmpeg\"
-    rmdir /s /q "C:\Tools\ffmpeg_temp"
-    del "%~dp0ffmpeg.zip"
-    setx /M PATH "%PATH%;C:\Tools\ffmpeg\bin"
-)
+echo ========================================================
+echo Creating configuration files with exact content...
+echo ========================================================
 
-:: 2. Check/Install yt-dlp
-where yt-dlp >nul 2>nul
-if %errorlevel% neq 0 (
-    echo Downloading yt-dlp...
-    powershell -Command "Invoke-WebRequest -Uri 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe' -OutFile 'C:\Tools\yt-dlp.exe'"
-)
+:: --- 2. CREATE DATA FILES ---
+:: Audio.txt
+(
+    echo https://www.youtube.com/watch?v=zXzzMjrrrFU^&list=OLAK5uy_leg-jn0nMirTa-8gy9m9trbLsvULL1IWs^&index=6
+    echo https://www.youtube.com/watch?v=5kw5smhdnN8
+    echo https://www.youtube.com/watch?v=0QXvpDsgJr8
+    echo https://www.youtube.com/watch?v=zGFbeLY-2zg^&list=TLGGgVtqCcdCT18zMDA2MjAyNg^&index=12
+    echo.
+) > "%PROJECT_DIR%\Audio.txt"
 
-:: 3. Check/Install Deno
-where deno >nul 2>nul
-if %errorlevel% neq 0 (
-    echo Downloading Deno...
-    powershell -Command "Invoke-WebRequest -Uri 'https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip' -OutFile 'deno.zip'"
-    powershell -Command "Expand-Archive -Path 'deno.zip' -DestinationPath 'C:\Tools\'"
-    del deno.zip
-)
+:: Video.txt
+(
+    echo https://www.youtube.com/watch?v=kcco0vGx_xE
+    echo https://www.youtube.com/watch?v=uuGyA-lmCho
+    echo.
+) > "%PROJECT_DIR%\Video.txt"
 
-echo Setup complete. Starting the downloader...
-python "לעריכת והורדת הקישורים.py"
+echo Setup complete! Your files are now exactly as specified.
 pause
