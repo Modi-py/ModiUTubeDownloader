@@ -7,7 +7,7 @@ import webbrowser
 import urllib.request
 import ssl
 
-CURRENT_VERSION = "1.0.0"
+CURRENT_VERSION = "1.0.2"
 
 def check_for_updates():
     # Create an unverified SSL context to bypass the certificate error
@@ -21,7 +21,7 @@ def check_for_updates():
             latest_version = response.read().decode('utf-8').strip()
             
         # Simple string comparison
-        if latest_version != CURRENT_VERSION:
+        if latest_version > CURRENT_VERSION:
             if messagebox.askyesno("Update Available", f"New version {latest_version} found! Go to GitHub?"):
                 webbrowser.open("https://github.com/Modi-py/ModiUTubeDownloader/releases")
         else:
