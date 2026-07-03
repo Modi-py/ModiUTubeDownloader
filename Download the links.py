@@ -1,26 +1,34 @@
 import tkinter as tk
+from tkinter import messagebox
 import subprocess
 import threading
 import os
 import webbrowser
 import urllib.request
+import ssl
 
 CURRENT_VERSION = "1.0.0"
 
 def check_for_updates():
+    # Create an unverified SSL context to bypass the certificate error
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
     try:
-        # Link to the raw version.txt file in your GitHub repo
         url = "https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/version.txt"
-        with urllib.request.urlopen(url) as response:
+# Pass the context to urlopen
+        with urllib.request.urlopen(url, context=ctx) as response:
             latest_version = response.read().decode('utf-8').strip()
-        
-        if latest_version > CURRENT_VERSION:
-            if tk.messagebox.askyesno("Update Available", f"New version {latest_version} found! Go to GitHub?"):
+            
+        # Simple string comparison
+        if latest_version != CURRENT_VERSION:
+            if messagebox.askyesno("Update Available", f"New version {latest_version} found! Go to GitHub?"):
                 webbrowser.open("https://github.com/Modi-py/ModiUTubeDownloader/releases")
         else:
-            tk.messagebox.showinfo("Update", "You are using the latest version!")
-    except:
-        tk.messagebox.showerror("Error", "Could not check for updates.")
+            messagebox.showinfo("Update", "You are using the latest version!")
+    except Exception as e:
+        # This will show you exactly WHY it fails (e.g., 404 error)
+        messagebox.showerror("Error", f"Could not check for updates: {e}")
 
 # --- Configuration ---
 PROJECT_PATH = r"C:\Tools\ModiUTubeDownloader"
