@@ -87,7 +87,8 @@ if %errorlevel% neq 0 (
 winget list --id Gyan.FFmpeg >nul 2>&1
 if %errorlevel% neq 0 (
     echo Installing FFmpeg...
-    winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements
+    winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\FFmpeg"
+	setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin"
 ) else (
     echo FFmpeg is already installed, skipping.
 )
@@ -96,7 +97,8 @@ if %errorlevel% neq 0 (
 winget list --id Python.Python.3.12 >nul 2>&1
 if %errorlevel% neq 0 (
     echo Installing Python 3.12...
-    winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements
+    winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Python312"
+	setx /M PATH "%PATH%;%TOOLS_DIR%\Python312"
 ) else (
     echo Python 3.12 is already installed, skipping.
 )
@@ -105,7 +107,8 @@ if %errorlevel% neq 0 (
 winget list --id yt-dlp.yt-dlp >nul 2>&1
 if %errorlevel% neq 0 (
     echo Installing yt-dlp...
-    winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements
+    winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%"
+	setx /M PATH "%PATH%;%TOOLS_DIR%"
 ) else (
     echo yt-dlp is already installed, skipping.
 )
@@ -114,7 +117,8 @@ if %errorlevel% neq 0 (
 winget list --id DenoLand.Deno >nul 2>&1
 if %errorlevel% neq 0 (
     echo Installing Deno...
-    winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements
+    winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Deno"
+	setx /M PATH "%PATH%;%TOOLS_DIR%\Deno"
 ) else (
     echo Deno is already installed, skipping.
 )
