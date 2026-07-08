@@ -1,0 +1,4 @@
+New features to develop:
+
+DACHUF: Create the files Audio_downloaded_success.txt and Video_downloaded_success.txt IN THE PROJECT FOLDER! If not, it's going to be placed in the yt-dlp folder, and when I'm gonna edit those files, the .py file isn't going to find them!
+Upon successfull download, auto-deleting the link from the list of links in the Text File with the links.
