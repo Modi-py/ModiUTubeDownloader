@@ -15,14 +15,16 @@ exit /b
 cd /d %~dp0
 
 set "TOOLS_DIR=C:\Tools"
-if not exist "%TOOLS_DIR%" mkdir "%TOOLS_DIR%"
-
 set "PROJECT_DIR=C:\Tools\ModiUTubeDownloader"
 set "DESKTOP_DIR=%USERPROFILE%\Desktop"
 
+if not exist "%TOOLS_DIR%" mkdir "%TOOLS_DIR%"
 if not exist "%PROJECT_DIR%" mkdir "%PROJECT_DIR%"
 if not exist "%DESKTOP_DIR%\Audio_Downloads" mkdir "%DESKTOP_DIR%\Audio_Downloads"
 if not exist "%DESKTOP_DIR%\Video_Downloads" mkdir "%DESKTOP_DIR%\Video_Downloads"
+
+attrib -r "%DESKTOP_DIR%\Video_Downloads"
+attrib -r "%DESKTOP_DIR%\Audio_Downloads"
 
 :: Configure Video_Downloads with a system icon from shell32.dll
 (
@@ -43,19 +45,34 @@ attrib +r "%DESKTOP_DIR%\Video_Downloads"
 attrib +r "%DESKTOP_DIR%\Audio_Downloads"
 
 
-:: --- DOWNLOAD SCRIPT FROM GITHUB ---
+:: --- DOWNLOAD PYTHON SCRIPT FROM GITHUB ---
 echo Downloading 'Download the links.py' to Desktop...
-
-:: Replace the URL below with your actual raw GitHub link
 set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download_the_links.py"
-
-:: Download the file to the Desktop
 curl -L -o "%DESKTOP_DIR%\Download_the_links.py" "%GITHUB_URL%"
 
 if exist "%DESKTOP_DIR%\Download_the_links.py" (
     echo Download successful!
 ) else (
-    echo ERROR: Failed to download the script. Please check the URL.
+    echo ERROR: Failed to download the python script. Please check the URL.
+)
+
+
+:: --- DOWNLOAD AUDIO & TEXT files FROM GITHUB and putting them in the TOOLS FOLDER ---
+echo Downloading 'Audio.txt' and 'Video.txt' to Tools Folder...
+set "GITHUB_AUDIO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Audio.txt"
+set "GITHUB_VIDEO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Video.txt"
+curl -L -o "%TOOLS_DIR%\Audio.txt" "%GITHUB_AUDIO_URL%"
+curl -L -o "%TOOLS_DIR%\Video.txt" "%GITHUB_VIDEO_URL%"
+
+if exist "%TOOLS_DIR%\Audio.txt" (
+    echo Download Audio.txt successful!
+) else (
+    echo ERROR: Failed to download the Audio.txt file. Please check the URL.
+)
+if exist "%TOOLS_DIR%\Video.txt" (
+    echo Download Video.txt successful!
+) else (
+    echo ERROR: Failed to download the Video.txt file. Please check the URL.
 )
 
 
@@ -63,21 +80,6 @@ echo ========================================================
 echo Creating configuration files with exact content...
 echo ========================================================
 
-:: Audio.txt
-(
-    echo https://www.youtube.com/watch?v=zXzzMjrrrFU^&list=OLAK5uy_leg-jn0nMirTa-8gy9m9trbLsvULL1IWs^&index=6
-    echo https://www.youtube.com/watch?v=5kw5smhdnN8
-    echo https://www.youtube.com/watch?v=0QXvpDsgJr8
-    echo https://www.youtube.com/watch?v=zGFbeLY-2zg^&list=TLGGgVtqCcdCT18zMDA2MjAyNg^&index=12
-    echo.
-) > "%PROJECT_DIR%\Audio.txt"
-
-:: Video.txt
-(
-    echo https://www.youtube.com/watch?v=kcco0vGx_xE
-    echo https://www.youtube.com/watch?v=uuGyA-lmCho
-    echo.
-) > "%PROJECT_DIR%\Video.txt"
 
 :: --- INSTALL LATEST VERSIONS VIA WINGET ---
 echo Checking and installing software...
@@ -100,45 +102,23 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: FFmpeg
-winget list --id Gyan.FFmpeg >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Installing FFmpeg...
-    winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\FFmpeg"
-	setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin"
-) else (
-    echo FFmpeg is already installed, skipping.
-)
+:: Helper function to add to PATH only if not present
+set "ADD_PATH_VAR=false"
+if not "%PATH%"=="%PATH:C:\Tools\FFmpeg\bin=%" set "ADD_PATH_VAR=true"
 
-:: Python 3
-winget list --id Python.Python.3.12 >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Installing Python 3.12...
-    winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Python312"
-	setx /M PATH "%PATH%;%TOOLS_DIR%\Python312"
-) else (
-    echo Python 3.12 is already installed, skipping.
-)
+:: Install/Check logic
+winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\FFmpeg"
+if not "%PATH%"=="%PATH:C:\Tools\FFmpeg\bin=%" (echo FFmpeg path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin")
 
-:: yt-dlp
-winget list --id yt-dlp.yt-dlp >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Installing yt-dlp...
-    winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%"
-	setx /M PATH "%PATH%;%TOOLS_DIR%"
-) else (
-    echo yt-dlp is already installed, skipping.
-)
+winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Python312"
+if not "%PATH%"=="%PATH:C:\Tools\Python312=%" (echo Python path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%\Python312")
 
-:: Deno
-winget list --id DenoLand.Deno >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Installing Deno...
-    winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Deno"
-	setx /M PATH "%PATH%;%TOOLS_DIR%\Deno"
-) else (
-    echo Deno is already installed, skipping.
-)
+winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%"
+if not "%PATH%"=="%PATH:C:\Tools=%" (echo yt-dlp path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%")
+
+winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Deno"
+if not "%PATH%"=="%PATH:C:\Tools\Deno=%" (echo Deno path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%")
+
 
 
 echo Setup complete! Your files are now exactly as specified.
