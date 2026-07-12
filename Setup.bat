@@ -47,29 +47,30 @@ attrib +r "%DESKTOP_DIR%\Audio_Downloads"
 
 :: --- DOWNLOAD PYTHON SCRIPT FROM GITHUB ---
 echo Downloading 'Download the links.py' to Desktop...
-set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download%%20the%%20links.py"
-curl -L -o "%DESKTOP_DIR%\Download_the_links.py" "%GITHUB_URL%"
+set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download_the_links.py"
+curl -L -o "%PROJECT_DIR%\Download_the_links.py" "%GITHUB_URL%"
+echo Creating shortcut on Desktop...
+powershell -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut('%DESKTOP_DIR%\Download_the_links.lnk');$s.TargetPath='%PROJECT_DIR%\Download_the_links.py';$s.Save()"
 
-if exist "%DESKTOP_DIR%\Download_the_links.py" (
-    echo Download successful!
+if exist "%PROJECT_DIR%\Download_the_links.py" (
+    echo File downloaded and shortcut created successfully!
 ) else (
-    echo ERROR: Failed to download the python script. Please check the URL.
+    echo ERROR: Failed to download the python script.
 )
-
 
 :: --- DOWNLOAD AUDIO & TEXT files FROM GITHUB and putting them in the TOOLS FOLDER ---
 echo Downloading 'Audio.txt' and 'Video.txt' to Tools Folder...
 set "GITHUB_AUDIO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Audio.txt"
 set "GITHUB_VIDEO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Video.txt"
-curl -L -o "%TOOLS_DIR%\Audio.txt" "%GITHUB_AUDIO_URL%"
-curl -L -o "%TOOLS_DIR%\Video.txt" "%GITHUB_VIDEO_URL%"
+curl -L -o "%PROJECT_DIR%\Audio.txt" "%GITHUB_AUDIO_URL%"
+curl -L -o "%PROJECT_DIR%\Video.txt" "%GITHUB_VIDEO_URL%"
 
-if exist "%TOOLS_DIR%\Audio.txt" (
+if exist "%PROJECT_DIR%\Audio.txt" (
     echo Download Audio.txt successful!
 ) else (
     echo ERROR: Failed to download the Audio.txt file. Please check the URL.
 )
-if exist "%TOOLS_DIR%\Video.txt" (
+if exist "%PROJECT_DIR%\Video.txt" (
     echo Download Video.txt successful!
 ) else (
     echo ERROR: Failed to download the Video.txt file. Please check the URL.
