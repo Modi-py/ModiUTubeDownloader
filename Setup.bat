@@ -47,7 +47,7 @@ attrib +r "%DESKTOP_DIR%\Audio_Downloads"
 
 :: --- DOWNLOAD PYTHON SCRIPT FROM GITHUB ---
 echo Downloading 'Download the links.py' to Desktop...
-set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download_the_links.py"
+set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download%%20the%%20links.py"
 curl -L -o "%DESKTOP_DIR%\Download_the_links.py" "%GITHUB_URL%"
 
 if exist "%DESKTOP_DIR%\Download_the_links.py" (
