@@ -46,81 +46,130 @@ attrib +r "%DESKTOP_DIR%\Audio_Downloads"
 
 
 :: --- DOWNLOAD PYTHON SCRIPT FROM GITHUB ---
-echo Downloading 'Download the links.py' to Desktop...
-set "GITHUB_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download_the_links.py"
-curl -L -o "%PROJECT_DIR%\Download_the_links.py" "%GITHUB_URL%"
+echo.
+echo Downloading 'Download the links.py' to %PROJECT_DIR...
+echo.
+set "GITHUB_URL_1=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Download_the_links.py"
+curl -L -o "%PROJECT_DIR%\Download_the_links.py" "%GITHUB_URL_1%"
+echo.
 echo Creating shortcut on Desktop...
+echo.
 powershell -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut('%DESKTOP_DIR%\Download_the_links.lnk');$s.TargetPath='%PROJECT_DIR%\Download_the_links.py';$s.Save()"
+
+:: Modify the existing shortcut icon using PowerShell
+powershell -Command "$sh = New-Object -ComObject WScript.Shell; $s = $sh.CreateShortcut('%USERPROFILE%\Desktop\download_the_links.lnk'); $s.IconLocation = '%SystemRoot%\System32\SHELL32.dll, 122'; $s.Save()"
+echo The icon for 'download_the_links.lnk' has been updated.
+echo.
+
 
 if exist "%PROJECT_DIR%\Download_the_links.py" (
     echo File downloaded and shortcut created successfully!
 ) else (
     echo ERROR: Failed to download the python script.
 )
+echo.
 
 :: --- DOWNLOAD AUDIO & TEXT files FROM GITHUB and putting them in the TOOLS FOLDER ---
-echo Downloading 'Audio.txt' and 'Video.txt' to Tools Folder...
+echo Downloading 'Audio.txt' and 'Video.txt' to %PROJECT_DIR...
+echo.
+
 set "GITHUB_AUDIO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Audio.txt"
 set "GITHUB_VIDEO_URL=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/Video.txt"
 curl -L -o "%PROJECT_DIR%\Audio.txt" "%GITHUB_AUDIO_URL%"
+echo.
 curl -L -o "%PROJECT_DIR%\Video.txt" "%GITHUB_VIDEO_URL%"
+echo.
 
 if exist "%PROJECT_DIR%\Audio.txt" (
     echo Download Audio.txt successful!
 ) else (
     echo ERROR: Failed to download the Audio.txt file. Please check the URL.
 )
+echo.
 if exist "%PROJECT_DIR%\Video.txt" (
     echo Download Video.txt successful!
 ) else (
     echo ERROR: Failed to download the Video.txt file. Please check the URL.
 )
 
-
+echo.
 echo ========================================================
 echo Creating configuration files with exact content...
 echo ========================================================
+echo.
 
-
-:: --- INSTALL LATEST VERSIONS VIA WINGET ---
 echo Checking and installing software...
+echo.
 
-:: --- CHECK FOR WINGET ---
-where winget >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ========================================================
-    echo ERROR: Windows Package Manager (winget) is not found.
-    echo.
-    echo To fix this, please:
-    echo 1. Open the Microsoft Store.
-    echo 2. Search for 'App Installer'.
-    echo 3. Install/Update it.
-    echo.
-    echo Alternatively, run this in PowerShell as Administrator:
-    echo Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe
-    echo ========================================================
-    pause
-    exit /b
+:: Installing using winget
+::winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\FFmpeg"
+::winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Python312"
+::winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%"
+::winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Deno"
+
+:: Installing without winget:
+
+:: 1. Python Installation
+python --version >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Python is already installed. Skipping.
+) else (
+    echo Downloading and installing Python 3.12...
+    curl -L -o "%TEMP%\python_installer.exe" "https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe"
+    start /wait "" "%TEMP%\python_installer.exe" /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
+    del "%TEMP%\python_installer.exe"
+)
+	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
+	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
+	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
+	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
+
+:: 2. FFmpeg
+where ffmpeg >nul 2>&1
+if %errorlevel% equ 0 (
+    echo FFmpeg is already installed. Skipping.
+) else (
+    echo Downloading and setting up FFmpeg...
+    curl -L -o "%TOOLS_DIR%\ffmpeg.zip" "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+    powershell -Command "Expand-Archive -Path '%TOOLS_DIR%\ffmpeg.zip' -DestinationPath '%TOOLS_DIR%\temp_ffmpeg' -Force"
+    for /d %%D in ("%TOOLS_DIR%\temp_ffmpeg\ffmpeg-*") do move "%%D" "%TOOLS_DIR%\FFmpeg"
+    del "%TOOLS_DIR%\ffmpeg.zip"
+    rd /s /q "%TOOLS_DIR%\temp_ffmpeg"
+	powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';%TOOLS_DIR%\FFmpeg\bin', 'Machine')"
 )
 
-:: Helper function to add to PATH only if not present
-set "ADD_PATH_VAR=false"
-if not "%PATH%"=="%PATH:C:\Tools\FFmpeg\bin=%" set "ADD_PATH_VAR=true"
+:: 3. yt-dlp
+where yt-dlp >nul 2>&1
+if %errorlevel% equ 0 (
+    echo yt-dlp is already installed. Skipping.
+) else (
+    echo Downloading yt-dlp...
+    curl -L -o "%TOOLS_DIR%\yt-dlp.exe" "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe"
+	powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';%TOOLS_DIR%', 'Machine')"
+)
 
-:: Install/Check logic
-winget install --id Gyan.FFmpeg -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\FFmpeg"
-if not "%PATH%"=="%PATH:C:\Tools\FFmpeg\bin=%" (echo FFmpeg path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin")
+:: 4. Deno
+where deno >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Deno is already installed. Skipping.
+) else (
+    echo Setting up Deno...
+    curl -L -o "%TOOLS_DIR%\deno.zip" "https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip"
+    powershell -Command "Expand-Archive -Path '%TOOLS_DIR%\deno.zip' -DestinationPath '%TOOLS_DIR%\Deno' -Force"
+    del "%TOOLS_DIR%\deno.zip"
+	powershell -Command "[Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';%TOOLS_DIR%\Deno', 'Machine')"
+)
+echo.
 
-winget install --id Python.Python.3.12 -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Python312"
-if not "%PATH%"=="%PATH:C:\Tools\Python312=%" (echo Python path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%\Python312")
+:: This is a better way of updating PATHs, instead of using CMD to add new PATHs as this code below:
+::setx /M PATH "%PATH%;%TOOLS_DIR%\Deno"
+::setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin"
+::setx /M PATH "%PATH%;%TOOLS_DIR%"
 
-winget install --id yt-dlp.yt-dlp -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%"
-if not "%PATH%"=="%PATH:C:\Tools=%" (echo yt-dlp path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%")
-
-winget install --id DenoLand.Deno -e --silent --accept-source-agreements --accept-package-agreements --install-location "%TOOLS_DIR%\Deno"
-if not "%PATH%"=="%PATH:C:\Tools\Deno=%" (echo Deno path exists) else (setx /M PATH "%PATH%;%TOOLS_DIR%")
-
-
-
-echo Setup complete! Your files are now exactly as specified.
+set "GITHUB_URL_2=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/README.md"
+curl -L -o "%PROJECT_DIR%\README.md" "%GITHUB_URL_2%"
+echo.
+echo Opening the README file from your project folder...
+echo.
+start "" notepad "%PROJECT_DIR%\README.md"
 pause
