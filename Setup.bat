@@ -120,9 +120,6 @@ if %errorlevel% equ 0 (
     del "%TEMP%\python_installer.exe"
 )
 	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
-	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
-	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
-	:: IMPORTANT: Since the previous line contains "PrependPath=1", the PATH is been automatically added.
 
 :: 2. FFmpeg
 where ffmpeg >nul 2>&1
@@ -169,6 +166,13 @@ echo.
 set "GITHUB_URL_2=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/README.md"
 curl -L -o "%PROJECT_DIR%\README.md" "%GITHUB_URL_2%"
 echo.
+if exist "%PROJECT_DIR%\README.md" (
+    echo Download README.md successful!
+) else (
+    echo ERROR: Failed to download the README.md file. Please check the URL.
+)
+echo.
+
 echo Opening the README file from your project folder...
 echo.
 start "" notepad "%PROJECT_DIR%\README.md"

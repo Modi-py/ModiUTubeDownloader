@@ -111,16 +111,16 @@ def show_download_popup(url):
     frame = tk.Frame(popup)
     frame.pack(pady=10)
     
-    def start_dl(mode):
-        if mode == "video":
-            cmd = get_video_base_cmd(VIDEO_OUT) + [url]
-        else:
-            cmd = get_audio_base_cmd(AUDIO_OUT) + [url]
-        threading.Thread(target=run_download_task, args=(cmd,), daemon=True).start()
-        popup.destroy()
+def start_dl(mode):
+    if mode == "video":
+        cmd = get_video_base_cmd(VIDEO_OUT) + [url]
+    else:
+        cmd = get_audio_base_cmd(AUDIO_OUT) + [url]
+    threading.Thread(target=run_download_task, args=(cmd,), daemon=True).start()
+    popup.destroy()
 
-    tk.Button(frame, text="Video", command=lambda: start_dl("video")).pack(side=tk.LEFT, padx=5)
-    tk.Button(frame, text="Audio", command=lambda: start_dl("audio")).pack(side=tk.LEFT, padx=5)
+tk.Button(frame, text="Video", command=lambda: start_dl("video")).pack(side=tk.LEFT, padx=5)
+tk.Button(frame, text="Audio", command=lambda: start_dl("audio")).pack(side=tk.LEFT, padx=5)
 
 def run_video_download():
     text_file = os.path.join(PROJECT_PATH, 'Video.txt')
