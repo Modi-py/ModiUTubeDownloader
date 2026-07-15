@@ -163,6 +163,31 @@ echo.
 ::setx /M PATH "%PATH%;%TOOLS_DIR%\FFmpeg\bin"
 ::setx /M PATH "%PATH%;%TOOLS_DIR%"
 
+
+
+:: pyperclip: Check if installed, and if no - install it.
+:: --- PREFER LOCAL PYTHON, FALL BACK TO SYSTEM ---
+if exist "%TOOLS_DIR%\Python312\python.exe" (
+    set "PYTHON_EXE=%TOOLS_DIR%\Python312\python.exe"
+) else (
+    set "PYTHON_EXE=python"
+)
+
+echo Using Python at: %PYTHON_EXE%
+
+:: --- CHECK AND INSTALL PYPERCLIP ---
+echo Checking for pyperclip...
+"%PYTHON_EXE%" -m pip show pyperclip >nul 2>&1
+
+if %errorlevel% neq 0 (
+    echo pyperclip not found. Installing...
+    "%PYTHON_EXE%" -m pip install pyperclip
+) else (
+    echo pyperclip is already installed.
+)
+
+
+
 set "GITHUB_URL_2=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/README.md"
 curl -L -o "%PROJECT_DIR%\README.md" "%GITHUB_URL_2%"
 echo.
