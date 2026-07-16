@@ -188,17 +188,17 @@ if %errorlevel% neq 0 (
 
 
 
-set "GITHUB_URL_2=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/README.md"
-curl -L -o "%PROJECT_DIR%\README.md" "%GITHUB_URL_2%"
+set "GITHUB_URL_2=https://raw.githubusercontent.com/Modi-py/ModiUTubeDownloader/main/README.txt"
+curl -L -o "%PROJECT_DIR%\README.txt" "%GITHUB_URL_2%"
 echo.
-if exist "%PROJECT_DIR%\README.md" (
-    echo Download README.md successful!
+if exist "%PROJECT_DIR%\README.txt" (
+    echo Download README.txt successful!
 ) else (
-    echo ERROR: Failed to download the README.md file. Please check the URL.
+    echo ERROR: Failed to download the README.txt file. Please check the URL.
 )
 echo.
 
 echo Opening the README file from your project folder...
 echo.
-start "" notepad "%PROJECT_DIR%\README.md"
+start "" notepad "%PROJECT_DIR%\README.txt"
 pause
