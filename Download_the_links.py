@@ -89,17 +89,17 @@ def run_download_task(command, text_file_path=None, archive_file_path=None):
                     f.write(line)
 
 # --- Clipboard Monitoring ---
-def monitor_clipboard(root):
-    last_text = ""
-    while True:
-        try:
-            current_text = pyperclip.paste()
-            if current_text != last_text and ("youtube.com/watch" in current_text or "youtu.be/" in current_text):
-                last_text = current_text
-                root.after(0, lambda: show_download_popup(current_text))
-        except Exception:
-            pass
-        time.sleep(2)
+#def monitor_clipboard(root):
+#    last_text = ""
+#    while True:
+#        try:
+#            current_text = pyperclip.paste()
+#            if current_text != last_text and ("youtube.com/watch" in current_text or "youtu.be/" in current_text):
+#                last_text = current_text
+#                root.after(0, lambda: show_download_popup(current_text))
+#        except Exception:
+#            pass
+#        time.sleep(2)
 
 def show_download_popup(url):
     popup = tk.Toplevel()
@@ -119,8 +119,8 @@ def start_dl(mode):
     threading.Thread(target=run_download_task, args=(cmd,), daemon=True).start()
     popup.destroy()
 
-tk.Button(frame, text="Video", command=lambda: start_dl("video")).pack(side=tk.LEFT, padx=5)
-tk.Button(frame, text="Audio", command=lambda: start_dl("audio")).pack(side=tk.LEFT, padx=5)
+# tk.Button(frame, text="Video", command=lambda: start_dl("video")).pack(side=tk.LEFT, padx=5)
+# tk.Button(frame, text="Audio", command=lambda: start_dl("audio")).pack(side=tk.LEFT, padx=5)
 
 def run_video_download():
     text_file = os.path.join(PROJECT_PATH, 'Video.txt')
@@ -149,42 +149,42 @@ def run_audio_download():
     ]
     threading.Thread(target=run_download_task, args=(cmd, text_file, archive_file), daemon=True).start()
 
-def monitor_clipboard():
-    last_text = ""
-    while True:
-        try:
-            current_text = pyperclip.paste()
-            # Check if it's a YouTube link and different from the last one
-            if current_text != last_text and ("youtube.com/watch" in current_text or "youtu.be/" in current_text):
-                last_text = current_text
-                
-                # Use root.after to safely trigger the GUI popup from the background thread
-                root.after(0, lambda: show_download_popup(current_text))
-                
-        except Exception:
-            pass
-        time.sleep(2) # Check every 2 seconds
+#def monitor_clipboard():
+#    last_text = ""
+#    while True:
+#        try:
+#            current_text = pyperclip.paste()
+#            # Check if it's a YouTube link and different from the last one
+#            if current_text != last_text and ("youtube.com/watch" in current_text or "youtu.be/" in current_text):
+#                last_text = current_text
+#                
+#                # Use root.after to safely trigger the GUI popup from the background thread
+#                root.after(0, lambda: show_download_popup(current_text))
+#                
+#        except Exception:
+#            pass
+#        time.sleep(2) # Check every 2 seconds
 
     
-def show_download_popup(url):
-    popup = tk.Toplevel()
-    popup.title("Download Selection")
-    popup.attributes("-topmost", True)
-    
-    # Add a label
-    tk.Label(popup, text="What would you like to download?").pack(pady=10, padx=20)
-    
-    # Create a frame for buttons
-    frame = tk.Frame(popup)
-    frame.pack(pady=10)
-    
-    # Video Button
-    tk.Button(frame, text="Video", command=lambda: [run_download_task(url, "video"), popup.destroy()]).pack(side=tk.LEFT, padx=5)
-    
-    # Audio Button
-    tk.Button(frame, text="Audio", command=lambda: [run_download_task(url, "audio"), popup.destroy()]).pack(side=tk.LEFT, padx=5)
-
-threading.Thread(target=monitor_clipboard, daemon=True).start()
+#def show_download_popup(url):
+#    popup = tk.Toplevel()
+#    popup.title("Download Selection")
+#    popup.attributes("-topmost", True)
+#    
+#    # Add a label
+#    tk.Label(popup, text="What would you like to download?").pack(pady=10, padx=20)
+#    
+#    # Create a frame for buttons
+#    frame = tk.Frame(popup)
+#    frame.pack(pady=10)
+#    
+#    # Video Button
+#    tk.Button(frame, text="Video", command=lambda: [run_download_task(url, "video"), popup.destroy()]).pack(side=tk.LEFT, padx=5)
+#    
+#    # Audio Button
+#    tk.Button(frame, text="Audio", command=lambda: [run_download_task(url, "audio"), popup.destroy()]).pack(side=tk.LEFT, padx=5)
+#
+#threading.Thread(target=monitor_clipboard, daemon=True).start()
 
 # UI Elements
 tk.Button(root, text="ערוך קובץ קישורים לוידאו", **button_style, command=lambda: os.startfile(os.path.join(PROJECT_PATH, 'Video.txt'))).grid(row=0, column=0, padx=10, pady=(20,10))
